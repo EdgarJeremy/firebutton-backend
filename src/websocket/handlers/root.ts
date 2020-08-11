@@ -1,13 +1,21 @@
 import socketio from 'socket.io';
 import { isObject } from 'lodash';
+import ModelFactoryInterface from '../../models/typings/ModelFactoryInterface';
 
-const rootHandler: (io: socketio.Server, socket: socketio.Socket) => void = (io: socketio.Server, socket: socketio.Socket): void => {
+const rootHandler: (io: socketio.Server, socket: socketio.Socket, models: ModelFactoryInterface) => void = (io: socketio.Server, socket: socketio.Socket, models: ModelFactoryInterface): void => {
     console.log('Connected:', socket.id);
     socket.on('panic', (data) => {
-        io.emit('panic', data);
+        console.log(data);
+        models.Report.create({
+            user_id: data.user.id,
+            latitude: data.position.coords.latitude,
+            longitude: data.position.coords.longitude,
+            photo: data.photo
+        }).then((report) => {
+            io.sockets.emit('panic', report);
+        });
     });
     socket.on('respond', () => {
-        console.log('respond');
         io.sockets.emit('respond');
     });
 };

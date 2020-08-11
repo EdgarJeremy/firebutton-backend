@@ -30,7 +30,7 @@ const allowOrigins: string | string[] = process.env.ALLOW_ORIGIN
 	: `http://localhost:${process.env.PORT || 1234}`;
 
 /** setup websocket */
-websocket(io);
+websocket(io, models);
 
 /** middlewares */
 app.use(bodyParser.json({ limit: process.env.REQUEST_LIMIT || '1024mb' }));
