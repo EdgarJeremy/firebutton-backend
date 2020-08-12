@@ -14,6 +14,7 @@ import createModels from './models';
 import createRoutes, { SiriusRouter } from './routes';
 import tokenMiddleware from './middlewares/pipes/token';
 import websocket from './websocket';
+import { ReportInstance } from './models/Report';
 
 /** import .env file configuration */
 dotenv.config();
@@ -55,10 +56,10 @@ routes.forEach((route: SiriusRouter) => {
 			let verbs: any = route.methods.get
 				? 'GET'
 				: route.methods.post
-				? 'POST'
-				: route.methods.put
-				? 'PUT'
-				: 'DELETE';
+					? 'POST'
+					: route.methods.put
+						? 'PUT'
+						: 'DELETE';
 			let keys: any = info.keys.map((t: any) => t.name);
 			routeData[key].endpoints.push({ endpoint, verbs, keys });
 		}
@@ -88,6 +89,21 @@ app.get(
 		res.json(data);
 	},
 );
+
+app.get(
+	'/proof/:id',
+	(req: express.Request, res: express.Response) => {
+		const { id } = req.params;
+		models.Report.findByPk(id).then((report) => {
+			const buff = new Buffer(report!.photo, 'base64');
+			res.writeHead(200, {
+				'Content-Type': 'image/png',
+				'Content-Length': buff.length
+			});
+			res.end(buff);
+		});
+	}
+)
 
 /** root route */
 if (process.env.NODE_ENV === 'development') {

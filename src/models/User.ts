@@ -8,6 +8,7 @@ export interface UserAttributes {
 	nik: string;
 	username: string;
 	password: string;
+	phone: string;
 	created_at?: Date;
 	updated_at?: Date;
 }
@@ -37,6 +38,10 @@ export const UserFactory: Factory<UserInstance, UserAttributes> = (
 			type: DataTypes.STRING(191),
 			allowNull: false,
 		},
+		phone: {
+			type: DataTypes.STRING(191),
+			allowNull: false
+		}
 	};
 	const User: Sequelize.Model<UserInstance, UserAttributes> = sequelize.define<
 		UserInstance,

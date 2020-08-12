@@ -12,7 +12,14 @@ const rootHandler: (io: socketio.Server, socket: socketio.Socket, models: ModelF
             longitude: data.position.coords.longitude,
             photo: data.photo
         }).then((report) => {
-            io.sockets.emit('panic', report);
+            models.Report.findByPk(report.id, {
+                include: [{
+                    model: models.User,
+                    attributes: ['id', 'nik', 'username', 'phone']
+                }]
+            }).then((r) => {
+                io.sockets.emit('panic', r);
+            });
         });
     });
     socket.on('respond', () => {
