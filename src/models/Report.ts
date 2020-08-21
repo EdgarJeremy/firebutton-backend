@@ -9,7 +9,7 @@ export interface ReportAttributes {
     latitude: number;
     longitude: number;
     photo: string;
-    verified: boolean;
+    verified?: boolean;
     user_id?: number;
 }
 
