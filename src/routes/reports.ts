@@ -28,13 +28,28 @@ const reportsRoute: Routes = (
                     req.query.q,
                     models,
                 );
-                console.log(parsed);
                 const data: PaginatedResult<ReportInstance> = await models.Report.findAndCountAll(parsed);
                 const body: OkResponse = { data };
 
                 res.json(body);
             },
         ),
+    );
+
+	router.put(
+		'/:id',
+		a(
+			async (req: express.Request, res: express.Response): Promise<void> => {
+				const { id }: any = req.params;
+				const data: ReportAttributes = req.body;
+				const report: ReportInstance | null = await models.Report.findOne({ where: { id } });
+                if (!report) throw new NotFoundError('Report tidak ditemukan');
+                report.update(data);
+				const body: OkResponse = { data: report };
+
+				res.json(body);
+			},
+		),
     );
 
     router.get(

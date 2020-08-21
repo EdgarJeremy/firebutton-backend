@@ -9,6 +9,7 @@ export interface ReportAttributes {
     latitude: number;
     longitude: number;
     photo: string;
+    verified: boolean;
     user_id?: number;
 }
 
@@ -32,6 +33,10 @@ export const ReportFactory: Factory<ReportInstance, ReportAttributes> = (
         photo: {
             type: DataTypes.TEXT,
             allowNull: false
+        },
+        verified: {
+            type: DataTypes.BOOLEAN,
+            allowNull: true
         }
     };
     const Report: Sequelize.Model<ReportInstance, ReportAttributes> = sequelize.define<
