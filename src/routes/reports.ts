@@ -1,4 +1,5 @@
 import express from 'express';
+import socketio from 'socket.io';
 import bcrypt from 'bcryptjs';
 import ModelFactoryInterface from '../models/typings/ModelFactoryInterface';
 import { Routes } from './typings/RouteInterface';
@@ -14,6 +15,7 @@ import onlyAuth from '../middlewares/protector/auth';
 const reportsRoute: Routes = (
     app: express.Application,
     models: ModelFactoryInterface,
+    io: socketio.Server
 ): express.Router => {
     const router: express.Router = express.Router();
 
@@ -36,20 +38,41 @@ const reportsRoute: Routes = (
         ),
     );
 
-	router.put(
-		'/:id',
-		a(
-			async (req: express.Request, res: express.Response): Promise<void> => {
-				const { id }: any = req.params;
-				const data: ReportAttributes = req.body;
-				const report: ReportInstance | null = await models.Report.findOne({ where: { id } });
+    router.put(
+        '/:id',
+        a(
+            async (req: express.Request, res: express.Response): Promise<void> => {
+                const { id }: any = req.params;
+                const data: ReportAttributes = req.body;
+                const report: ReportInstance | null = await models.Report.findOne({ where: { id } });
                 if (!report) throw new NotFoundError('Report tidak ditemukan');
                 report.update(data);
-				const body: OkResponse = { data: report };
+                const body: OkResponse = { data: report };
 
-				res.json(body);
-			},
-		),
+                res.json(body);
+            },
+        ),
+    );
+
+    router.post(
+        '/',
+        // createUser,
+        a(
+            async (req: express.Request, res: express.Response): Promise<void> => {
+                const data: ReportAttributes = req.body;
+                const report: ReportInstance = await models.Report.create(data);
+                const toSend: ReportInstance | null = await models.Report.findByPk(report.id, {
+                    include: [{
+                        model: models.User,
+                        attributes: ['id', 'nik', 'username', 'phone']
+                    }]
+                });
+                io.sockets.emit('panic', toSend);
+                const body: OkResponse = { data: report };
+
+                res.json(body);
+            },
+        ),
     );
 
     router.get(
