@@ -67,8 +67,8 @@ const reportsRoute: Routes = (
                         attributes: ['id', 'nik', 'username', 'phone']
                     }]
                 });
-                console.log('receiving report', data);
-                io.emit('panic', toSend);
+                console.log('receiving report', report.id);
+                io.emit('panic');
                 const body: OkResponse = { data: report };
 
                 res.json(body);
