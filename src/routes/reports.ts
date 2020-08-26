@@ -68,7 +68,7 @@ const reportsRoute: Routes = (
                     }]
                 });
                 console.log('receiving report', report.id);
-                io.sockets.emit('panic', toSend);
+                io.emit('panic', toSend);
                 const body: OkResponse = { data: report };
 
                 res.json(body);
