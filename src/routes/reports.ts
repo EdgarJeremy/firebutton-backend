@@ -67,8 +67,7 @@ const reportsRoute: Routes = (
                         attributes: ['id', 'nik', 'username', 'phone']
                     }]
                 });
-                console.log('receiving report', report.id);
-                io.emit('panic');
+                io.emit('panic', report.id);
                 const body: OkResponse = { data: report };
 
                 res.json(body);
@@ -81,7 +80,11 @@ const reportsRoute: Routes = (
         a(
             async (req: express.Request, res: express.Response): Promise<void> => {
                 const { id }: any = req.params;
-                const report: ReportInstance | null = await models.Report.findOne({ where: { id } });
+                const parsed: sequelize.FindOptions<ReportInstance> = Parser.parseQuery<ReportInstance>(
+                    req.query.q,
+                    models,
+                );
+                const report: ReportInstance | null = await models.Report.findByPk(id, parsed);
                 if (!report) throw new NotFoundError('Report tidak ditemukan');
                 const body: OkResponse = { data: report };
 
